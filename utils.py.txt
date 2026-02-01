@@ -1,0 +1,36 @@
+# utils.py - Handles all input validation and guidance for the user
+
+def validate_name(name_input):
+    """Ensures name is not empty and contains no numbers."""
+    if not name_input.strip():
+        return False, "Error: Student name cannot be empty."
+    if any(char.isdigit() for char in name_input):
+        return False, "Error: Student name must be a string (no numbers)."
+    return True, ""
+
+def validate_roll(roll_input):
+    """Ensures roll number is a valid integer."""
+    if not roll_input.strip():
+        return False, "Error: Roll number is required."
+    if not roll_input.isdigit():
+        return False, "Error: Roll number must be an integer."
+    return True, ""
+
+def validate_email(email_input):
+    """Checks for basic valid email format."""
+    if not email_input.strip():
+        return False, "Error: Email address is required."
+    if "@" not in email_input or "." not in email_input:
+        return False, "Error: Please enter a valid email address."
+    return True, ""
+
+def get_validated_input(prompt, validation_func):
+    """Loops until the user provides valid input based on the provided function."""
+    while True:
+        user_data = input(prompt).strip()
+        is_valid, error_msg = validation_func(user_data)
+        if is_valid:
+            return user_data
+        else:
+            print(error_msg)
+            print("Guidance: Please check the requirements and try again.")

@@ -1,0 +1,99 @@
+# student_manager.py - Core logic for records and CSV file operations
+import csv
+import os
+
+STUDENT_FILE = 'students.csv'
+students = []
+
+def load_records():
+    """Loads student data from the CSV file at program startup."""
+    global students
+    students = []
+    if not os.path.exists(STUDENT_FILE):
+        print(f"Loading student records from {STUDENT_FILE}... File not found. Starting fresh.")
+        return
+
+    try:
+        with open(STUDENT_FILE, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                students.append(row)
+        print(f"Loading student records from {STUDENT_FILE}... Done!")
+    except Exception as e:
+        print(f"Error loading records: {e}")
+
+def save_records():
+    """Saves the current list of students to the CSV file."""
+    try:
+        with open(STUDENT_FILE, mode='w', newline='', encoding='utf-8') as file:
+            fieldnames = ['name', 'roll', 'email', 'dept']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(students)
+    except Exception as e:
+        print(f"Error saving records: {e}")
+
+def add_student(name, roll, email, dept):
+    """Adds a new student after checking for duplicate roll numbers."""
+    # Requirement: Prevent Duplicate Roll Numbers
+    for s in students:
+        if s['roll'] == roll:
+            print(f"Error: Roll number {roll} already exists for another student.")
+            return
+
+    new_student = {
+        'name': name,
+        'roll': roll,
+        'email': email,
+        'dept': dept
+    }
+    students.append(new_student)
+    save_records() # Requirement: Automatically save when added
+    print("Student record added successfully!")
+
+def view_students():
+    """Displays all records in a formatted list."""
+    if not students:
+        print("\n===== No Student Records Found =====")
+        return
+
+    print("\n===== All Students =====")
+    for i, s in enumerate(students, 1):
+        print(f"{i}. Name : {s['name']}")
+        print(f"   Roll : {s['roll']}")
+        print(f"   Email : {s['email']}")
+        print(f"   Department : {s['dept']}")
+    print("=" * 24)
+
+def search_students(query):
+    """Bonus: Search records by name or email."""
+    query = query.lower()
+    found = False
+    print("\nSearch Result:")
+    for s in students:
+        if query in s['name'].lower() or query in s['email'].lower() or query == s['roll']:
+            print(f"Name : {s['name']}")
+            print(f"Roll : {s['roll']}")
+            print(f"Email : {s['email']}")
+            print(f"Department : {s['dept']}")
+            print("-" * 20)
+            found = True
+    
+    if not found:
+        print("No matching student records found.")
+
+def remove_student(roll_number):
+    """Removes a record by roll number with a confirmation step."""
+    global students
+    for s in students:
+        if s['roll'] == roll_number:
+            confirm = input(f"Are you sure you want to delete student with roll number {roll_number}? (y/n): ").lower()
+            if confirm == 'y':
+                students = [item for item in students if item['roll'] != roll_number]
+                save_records()
+                print("Student record deleted successfully!")
+                return
+            else:
+                print("Deletion cancelled.")
+                return
+    print(f"Error: Roll number {roll_number} not found.")

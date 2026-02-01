@@ -1,0 +1,48 @@
+# main.py - The main entry point and terminal menu system
+import student_manager as sm
+import utils
+
+def main():
+    print("Welcome to the Student Record Management System!")
+    sm.load_records()
+
+    while True:
+        print("\n=========== MENU ===========")
+        print("1. Add Student")
+        print("2. View Students")
+        print("3. Search Student")
+        print("4. Remove Student")
+        print("5. Exit")
+        print("============================")
+        
+        choice = input("Enter your choice: ").strip()
+
+        if choice == '1':
+            name = utils.get_validated_input("Enter Student Name: ", utils.validate_name)
+            roll = utils.get_validated_input("Enter Roll Number: ", utils.validate_roll)
+            email = utils.get_validated_input("Enter Email: ", utils.validate_email)
+            dept = input("Enter Department: ").strip()
+            if not dept:
+                dept = "N/A"
+            sm.add_student(name, roll, email, dept)
+
+        elif choice == '2':
+            sm.view_students()
+
+        elif choice == '3':
+            query = input("Enter search term (name/email/roll): ").strip()
+            sm.search_students(query)
+
+        elif choice == '4':
+            roll_to_del = input("Enter the roll number of the student to delete: ").strip()
+            sm.remove_student(roll_to_del)
+
+        elif choice == '5':
+            print("Thank you for using the Student Record Management System. Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice! Please select 1-5.")
+
+if __name__ == "__main__":
+    main()
